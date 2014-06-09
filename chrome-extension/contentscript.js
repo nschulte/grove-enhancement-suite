@@ -19,23 +19,31 @@ window.ondrop = function(e) {
 
 function upload(file) {
     var imageLink ="";
-    /* Is the file an image? */
     if (!file || !file.type.match(/image.*/)) return;
     document.body.className = "uploading";
     var fd = new FormData();
-    fd.append("image", file); // Append the file
-    // Note: I can't find how to get a key that works, only OAuth2 id and secret...
-    fd.append("key", "6528448c258cff474ca9701c5bab6927"); // Get your own key http://api.imgur.com/
+    fd.append("image", file);
     var xhr = new XMLHttpRequest();
-    xhr.open("POST", "http://api.imgur.com/2/upload.json");
+    xhr.open("POST", "https://api.imgur.com/3/upload.json");
+    xhr.setRequestHeader("Authorization","Client-ID 52437b3a8db42b4");
     xhr.onload = function() {
-        var link = JSON.parse(xhr.responseText).upload.links.imgur_page;
-        var imageLink = ""+link.replace("http://imgur.com/", "http://i.imgur.com/")+".jpg";
+        var link = JSON.parse(xhr.responseText).data.link;
+        var imageLink = ""+link.replace("http://imgur.com/", "https://i.imgur.com/");
 
-        var messageField = document.getElementsByClassName('message-field')[0];
-        messageField.value = messageField.value + ' ' + imageLink;
+        var messageField;
+        // channel
+        if (document.getElementById("channel-view").style.display == "block") {
+            messageField = document.getElementsByClassName('message-field')[0];
+            messageField.value = messageField.value + ' ' + imageLink;
+        }
 
-        /* Image Preview */
+        // private channel
+        else {
+            messageField = document.getElementsByClassName('message-field')[1];
+            messageField.value = messageField.value + ' ' + imageLink;
+        }
+
+         /* Image Preview */
         //document.getElementById("result").style.display = "inline";
         //document.getElementById("link-to-image").style.background = "url(" + imageLink + ") center center no-repeat";
 
